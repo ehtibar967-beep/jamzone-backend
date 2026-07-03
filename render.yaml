@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: jamzone-backend
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+    buildCommand: npm install
+    startCommand: node server.js
+    autoDeploy: true
