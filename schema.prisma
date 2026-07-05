@@ -1,0 +1,105 @@
+// 🎵 JamZone Database Schema (Prisma ORM)
+// PostgreSQL / SQLite compatible
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String    @id @default(uuid())
+  username     String    @unique
+  name         String
+  phone        String?
+  avatar       String    @default("😎")
+  bio          String?
+  jamCoins     Int       @default(500) // Стартовый баланс монет
+  isPremium    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Отношения
+  createdRooms Room[]    @relation("RoomHost")
+  messages     Message[]
+  tracks       Track[]   @relation("UserTracks")
+  creator      CreatorProfile?
+  tipsSent     JamCoinTransaction[] @relation("TipsSent")
+  tipsReceived JamCoinTransaction[] @relation("TipsReceived")
+}
+
+model CreatorProfile {
+  id           String    @id @default(uuid())
+  userId       String    @unique
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stageName    String
+  genre        String
+  verified     Boolean   @default(true)
+  totalEarned  Int       @default(0)
+  bio          String?
+  coverUrl     String?
+  createdAt    DateTime  @default(now())
+
+  releases     Track[]   @relation("CreatorReleases")
+}
+
+model Room {
+  id           String    @id @default(uuid())
+  name         String
+  topic        String
+  cover        String    @default("💬")
+  isPublic     Boolean   @default(true)
+  hostId       String
+  host         User      @relation("RoomHost", fields: [hostId], references: [id])
+  currentTrackId String?
+  currentPos   Float     @default(0) // Текущая позиция воспроизведения в сек
+  isPlaying    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+
+  messages     Message[]
+}
+
+model Track {
+  id           String    @id @default(uuid())
+  title        String
+  artist       String
+  album        String?
+  genre        String?
+  duration     Int       @default(180)
+  coverUrl     String?
+  audioUrl     String?
+  yandexPath   String?
+  isLicensed   Boolean   @default(false)
+  uploaderId   String?
+  uploader     User?     @relation("UserTracks", fields: [uploaderId], references: [id])
+  creatorId    String?
+  creator      CreatorProfile? @relation("CreatorReleases", fields: [creatorId], references: [id])
+  playCount    Int       @default(0)
+  createdAt    DateTime  @default(now())
+}
+
+model Message {
+  id           String    @id @default(uuid())
+  roomId       String
+  room         Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  senderId     String
+  sender       User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  text         String
+  msgType      String    @default("text") // text, audio, listen_invite, tip
+  createdAt    DateTime  @default(now())
+}
+
+model JamCoinTransaction {
+  id           String    @id @default(uuid())
+  fromId       String
+  fromUser     User      @relation("TipsSent", fields: [fromId], references: [id])
+  toId         String
+  toUser       User      @relation("TipsReceived", fields: [toId], references: [id])
+  amount       Int
+  message      String?
+  trackId      String?
+  createdAt    DateTime  @default(now())
+}

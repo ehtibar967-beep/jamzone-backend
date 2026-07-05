@@ -1,0 +1,40 @@
+{
+  "name": "jamzone-backend",
+  "version": "1.0.0",
+  "description": "Realtime Backend Server for JamZone (Node.js + TypeScript + Socket.io + Prisma)",
+  "main": "dist/server.js",
+  "scripts": {
+    "start": "npx prisma db push && node dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "build": "npx prisma generate && tsc",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push"
+  },
+  "keywords": [
+    "jamzone",
+    "realtime",
+    "listen-together",
+    "websocket",
+    "music-social"
+  ],
+  "author": "JamZone Founder",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.14.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.12.12",
+    "prisma": "^5.14.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.5"
+  }
+}
